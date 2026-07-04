@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cocoon Calc">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0c0e14">
+<title>Cocoon Calculator</title>
+
+<!-- Inline SVG icon as data URI for home screen -->
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZxjWHgAABKJJREFUeJzt3M+LFVcYxvHnzL1z7525M+OoYxI1GkUlGkTRjQoKLoSAoIjgxl0Xgv/ARVy5EHHlQsTFH+BCXAguxIUguHAhCCKIIAiKIIggCCIIIggiiCCC+OWZM3fuvTNz7pl7b+Z9l/M9J4GBzHvOfZ/3fU7OOXMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP8Xs+0CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0c0e14;
+    --card: #13161f;
+    --card2: #1a1e2e;
+    --border: #252a3d;
+    --gold: #f0c060;
+    --gold2: #c89a3a;
+    --silk: #eee8da;
+    --muted: #5a6180;
+    --text: #d8dce8;
+    --green: #52d080;
+    --blue: #70b0f8;
+    --red: #f07070;
+    --radius: 14px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  .header {
+    background: linear-gradient(160deg, #181c2a 0%, #0e1018 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px 16px;
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .hicon {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .htitle { font-size: 1.05rem; font-weight: 700; color: var(--silk); letter-spacing: -0.02em; }
+  .hsub   { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Install banner */
+  .install-banner {
+    background: linear-gradient(135deg, rgba(240,192,96,0.12), rgba(200,154,58,0.08));
+    border-bottom: 1px solid rgba(240,192,96,0.2);
+    padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .install-banner p { font-size: 0.75rem; color: var(--gold); line-height: 1.5; }
+  .install-banner p span { color: var(--muted); font-size: 0.68rem; display: block; margin-top: 2px; }
+  .install-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 8px; padding: 8px 16px;
+    color: #0c0e14; font-weight: 700; font-size: 0.78rem;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .ios-hint {
+    background: rgba(82,208,128,0.08);
+    border-bottom: 1px solid rgba(82,208,128,0.15);
+    padding: 10px 20px;
+    font-size: 0.72rem; color: var(--green);
+    display: none;
+  }
+
+  .page { max-width: 680px; margin: 0 auto; padding: 22px 16px 0; }
+
+  .sec-label {
+    font-size: 0.62rem; font-family: 'JetBrains Mono', monospace;
+    color: var(--gold); letter-spacing: 0.13em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .sp-grid    { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  .field label {
+    display: block;
+    font-size: 0.68rem; color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .field label span { color: var(--gold); }
+
+  .field input {
+    width: 100%;
+    background: var(--card2);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 14px;
+    color: var(--silk);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem; font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .field input:focus {
+    border-color: var(--gold2);
+    box-shadow: 0 0 0 3px rgba(200,154,58,0.15);
+  }
+  .field .hint { font-size: 0.62rem; color: var(--muted); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+
+  .calc-btn {
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border: none; border-radius: 10px;
+    color: #0c0e14; font-family: 'Inter', sans-serif;
+    font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.02em;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .calc-btn:active { opacity: 0.85; transform: scale(0.99); }
+
+  .result-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+    display: none;
+  }
+  .result-card.visible { display: block; }
+
+  .const-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card2);
+  }
+  .const-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  }
+  .const-pill .range { color: var(--muted); }
+  .const-pill .val   { color: var(--gold); font-weight: 600; }
+  .const-pill.active { border-color: var(--gold2); background: rgba(200,154,58,0.08); }
+
+  .out-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+  .out-cell { background: var(--card); padding: 16px 18px; }
+  .out-cell .lbl { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 5px; }
+  .out-cell .val { font-size: 1.25rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .out-cell .val.gold  { color: var(--gold); }
+  .out-cell .val.blue  { color: var(--blue); }
+  .out-cell .val.silk  { color: var(--silk); }
+  .out-cell .sub { font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
+
+  .purchase-display {
+    padding: 20px 18px;
+    border-top: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(82,208,128,0.06), rgba(82,208,128,0.02));
+  }
+  .purchase-display .lbl { font-size: 0.65rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+  .purchase-display .big {
+    font-size: 2rem; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green); letter-spacing: -0.03em;
+  }
+  .purchase-display .formula {
+    font-size: 0.68rem; color: var(--muted); margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace; line-height: 1.6;
+  }
+  .purchase-display .formula span { color: var(--blue); }
+
+  .net-strip {
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    background: var(--card2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+  }
+
+  .error-box {
+    background: rgba(240,112,112,0.08);
+    border: 1px solid rgba(240,112,112,0.3);
+    border-radius: 10px; padding: 14px 18px;
+    font-size: 0.8rem; color: var(--red);
+    margin-bottom: 16px; display: none;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .error-box.visible { display: block; }
+
+  .divider { height: 1px; background: var(--border); margin: 8px 0 20px; }
+
+  .history-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .history-item:hover { border-color: var(--gold2); }
+  .history-item .hinfo { font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .history-item .hprice { font-size: 0.95rem; font-weight: 700; color: var(--green); font-family: 'JetBrains Mono', monospace; }
+  .history-item .hdel { font-size: 0.65rem; color: var(--red); padding: 4px 8px; border: 1px solid rgba(240,112,112,0.3); border-radius: 6px; }
+  .no-history { text-align: center; padding: 20px; color: var(--muted); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hicon">🪲</div>
+  <div>
+    <div class="htitle">Cocoon Calculator</div>
+    <div class="hsub">Shell Ratio · Reindata · Purchase Price</div>
+  </div>
+</div>
+
+<!-- Android install banner -->
+<div class="install-banner" id="installBanner" style="display:none">
+  <p>📲 Install this app on your phone
+    <span>Use it offline, like a native app</span>
+  </p>
+  <button class="install-btn" onclick="installApp()">Install</button>
+</div>
+
+<!-- iOS hint -->
+<div class="ios-hint" id="iosHint">
+  📲 To install on iPhone: tap the <strong>Share</strong> button (□↑) then <strong>"Add to Home Screen"</strong>
+</div>
+
+<div class="page">
+
+  <div class="sec-label">📐 Cocoon Measurements</div>
+  <div class="card">
+    <div class="input-grid">
+      <div class="field">
+        <label><span>A</span> &nbsp;Cocoon Wt of 20 (g)</label>
+        <input type="number" id="cocoonWt20" placeholder="e.g. 30.0" inputmode="decimal" step="0.01">
+        <div class="hint">Total weight of 20 cocoons</div>
+      </div>
+      <div class="field">
+        <label><span>B</span> &nbsp;Shell Wt of 20 (g)</label>
+        <input type="number" id="shellWt20" placeholder="e.g. 4.8" inputmode="decimal" step="0.01">
+        <div class="hint">Shell weight of 20 cocoons</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">💰 Pricing Parameters</div>
+  <div class="card">
+    <div class="sp-grid">
+      <div class="field">
+        <label><span>SP</span> Selling Price (₹/kg)</label>
+        <input type="number" id="sellingPrice" placeholder="5800" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label><span>CoP</span> Cost of Prod. (₹/kg)</label>
+        <input type="number" id="costProd" placeholder="600" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label><span>P</span> Profit (₹/kg)</label>
+        <input type="number" id="profit" placeholder="500" inputmode="decimal">
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">⚡ Calculate</button>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result-card" id="resultCard">
+    <div class="const-row">
+      <div class="const-pill" id="pill165"><span class="range">≤ 16%</span><span class="val">165</span></div>
+      <div class="const-pill" id="pill150"><span class="range">16.1–18%</span><span class="val">150</span></div>
+      <div class="const-pill" id="pill133"><span class="range">&gt;18%</span><span class="val">133</span></div>
+    </div>
+    <div class="out-grid">
+      <div class="out-cell">
+        <div class="lbl">Shell Ratio (%)</div>
+        <div class="val gold" id="r-shellRatio">—</div>
+        <div class="sub">Shell Wt ÷ Cocoon Wt × 100</div>
+      </div>
+      <div class="out-cell">
+        <div class="lbl">Reindata Constant</div>
+        <div class="val blue" id="r-constant">—</div>
+        <div class="sub" id="r-constRange">—</div>
+      </div>
+      <div class="out-cell">
+        <div class="lbl">Reindata (kg)</div>
+        <div class="val silk" id="r-reindata">—</div>
+        <div class="sub">Constant ÷ Shell Ratio</div>
+      </div>
+      <div class="out-cell">
+        <div class="lbl">Net Amount</div>
+        <div class="val blue" id="r-net">—</div>
+        <div class="sub">SP − CoP − Profit</div>
+      </div>
+    </div>
+    <div class="net-strip" id="r-netFormula">—</div>
+    <div class="purchase-display">
+      <div class="lbl">PURCHASE PRICE OF COCOONS</div>
+      <div class="big" id="r-purchasePrice">—</div>
+      <div class="formula" id="r-formula">—</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sec-label">🕓 Calculation History</div>
+  <div class="no-history" id="noHistory">No calculations yet</div>
+  <div id="historyList"></div>
+
+</div>
+
+<script>
+  // ── PWA: register service worker ──
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'cocoon-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll([self.location.pathname])));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e => { self.clients.claim(); });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request))));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  }
+
+  // ── PWA: install prompt (Android/Chrome) ──
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'flex';
+  });
+
+  function installApp() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        document.getElementById('installBanner').style.display = 'none';
+      });
+    }
+  }
+
+  // ── iOS hint ──
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isInStandalone = window.navigator.standalone;
+  if (isIOS && !isInStandalone) {
+    document.getElementById('iosHint').style.display = 'block';
+  }
+
+  // ── Calculator logic ──
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('cocoon_history') || '[]'); } catch(e) {}
+
+  function getConstant(sr) {
+    if (sr >= 14 && sr <= 16)  return { val: 165, range: '14% – 16.0%', key: '165' };
+    if (sr > 16  && sr <= 18)  return { val: 150, range: '16.1% – 18.0%', key: '150' };
+    if (sr > 18)               return { val: 133, range: '18.1% and above', key: '133' };
+    return null;
+  }
+
+  function r(v, d=2) { return Math.round(v * Math.pow(10,d)) / Math.pow(10,d); }
+
+  function calculate() {
+    const cw  = parseFloat(document.getElementById('cocoonWt20').value);
+    const sw  = parseFloat(document.getElementById('shellWt20').value);
+    const SP  = parseFloat(document.getElementById('sellingPrice').value);
+    const CoP = parseFloat(document.getElementById('costProd').value);
+    const P   = parseFloat(document.getElementById('profit').value);
+
+    document.getElementById('errorBox').classList.remove('visible');
+
+    if (isNaN(cw) || cw <= 0) return showError('Enter a valid Cocoon Weight of 20.');
+    if (isNaN(sw) || sw <= 0) return showError('Enter a valid Shell Weight of 20.');
+    if (sw >= cw)             return showError('Shell Weight must be less than Cocoon Weight.');
+    if (isNaN(SP)||isNaN(CoP)||isNaN(P)) return showError('Enter valid SP, Cost of Production and Profit.');
+
+    const shellRatio = r((sw / cw) * 100, 3);
+    const constObj   = getConstant(shellRatio);
+    if (!constObj) return showError(`Shell Ratio ${shellRatio}% is below 14%. No valid constant.`);
+
+    const reindata      = r(constObj.val / shellRatio, 4);
+    const net           = SP - CoP - P;
+    const purchasePrice = r(net / reindata, 2);
+
+    document.getElementById('r-shellRatio').textContent  = shellRatio.toFixed(3) + '%';
+    document.getElementById('r-constant').textContent    = constObj.val;
+    document.getElementById('r-constRange').textContent  = constObj.range;
+    document.getElementById('r-reindata').textContent    = reindata.toFixed(4) + ' kg';
+    document.getElementById('r-net').textContent         = '₹' + net;
+    document.getElementById('r-netFormula').textContent  =
+      `Net = ₹${SP} − ₹${CoP} − ₹${P} = ₹${net}`;
+    document.getElementById('r-purchasePrice').textContent = '₹ ' + purchasePrice.toFixed(2);
+    document.getElementById('r-formula').innerHTML =
+      `Purchase Price = Net ÷ Reindata(kg)<br>= <span>₹${net}</span> ÷ <span>${reindata.toFixed(4)}</span> = <span>₹${purchasePrice.toFixed(2)} per kg of cocoon</span>`;
+
+    ['pill165','pill150','pill133'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById('pill' + constObj.val).classList.add('active');
+    document.getElementById('resultCard').classList.add('visible');
+
+    const entry = { id: Date.now(), cw, sw, shellRatio, constant: constObj.val, reindata, SP, CoP, P, net, purchasePrice, time: new Date().toLocaleTimeString() };
+    history.unshift(entry);
+    if (history.length > 20) history.pop();
+    try { localStorage.setItem('cocoon_history', JSON.stringify(history)); } catch(e) {}
+    renderHistory();
+  }
+
+  function showError(msg) {
+    const b = document.getElementById('errorBox');
+    b.textContent = '⚠ ' + msg;
+    b.classList.add('visible');
+    document.getElementById('resultCard').classList.remove('visible');
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    const none = document.getElementById('noHistory');
+    if (!history.length) { none.style.display='block'; list.innerHTML=''; return; }
+    none.style.display = 'none';
+    list.innerHTML = history.map(h => `
+      <div class="history-item" onclick="loadHistory(${h.id})">
+        <div>
+          <div class="hinfo">CW:${h.cw}g · SW:${h.sw}g · SR:${h.shellRatio}% · C:${h.constant} · ${h.time}</div>
+          <div class="hinfo" style="margin-top:3px">SP:₹${h.SP} CoP:₹${h.CoP} P:₹${h.P}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="hprice">₹${h.purchasePrice.toFixed(2)}</div>
+          <div class="hdel" onclick="event.stopPropagation();delHistory(${h.id})">✕</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function loadHistory(id) {
+    const h = history.find(x => x.id===id);
+    if (!h) return;
+    document.getElementById('cocoonWt20').value   = h.cw;
+    document.getElementById('shellWt20').value    = h.sw;
+    document.getElementById('sellingPrice').value = h.SP;
+    document.getElementById('costProd').value     = h.CoP;
+    document.getElementById('profit').value       = h.P;
+    calculate();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function delHistory(id) {
+    history = history.filter(x => x.id!==id);
+    try { localStorage.setItem('cocoon_history', JSON.stringify(history)); } catch(e) {}
+    renderHistory();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key==='Enter') calculate(); });
+
+  // Defaults
+  document.getElementById('sellingPrice').value = '5800';
+  document.getElementById('costProd').value = '600';
+  document.getElementById('profit').value = '500';
+  renderHistory();
+</script>
+</body>
+</html>
